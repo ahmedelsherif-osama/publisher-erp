@@ -1,0 +1,77 @@
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+
+### VS Code ###
+
+src/main/java/com/ahmed/publishersync/docker-compose.yml
+
+# Maven target folder
+/target/
+
+# Maven Wrapper files (they can stay if you want, optional)
+/.mvn/wrapper/maven-wrapper.properties
+/mvnw
+/mvnw.cmd
+
+# IntelliJ IDEA
+/.idea/
+/*.iml
+/out/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Spring Boot
+spring.log
+
+# Eclipse
+
+.settings/
+
+# NetBeans
+/build/
+
+
+# Temporary files
+*.tmp
+*.swp
+*~
+
+# Node modules (if you add frontend later)
+node_modules/
