@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
@@ -22,6 +23,6 @@ public class Product {
 
     private String name;
     private String description;
-    private double price;
+    private BigDecimal price;
     private int stockQuantity;
 }
