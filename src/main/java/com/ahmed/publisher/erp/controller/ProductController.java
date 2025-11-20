@@ -52,6 +52,7 @@ public class ProductController {
     public ResponseEntity<Void> delete(@PathVariable UUID id){
         service.delete(id);
         return  ResponseEntity.noContent().build();
+
     }
 
 }
