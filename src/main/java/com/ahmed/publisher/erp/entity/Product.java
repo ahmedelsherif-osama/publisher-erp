@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
-@Table(name="orders")
+@Table(name="products")
 @Getter
 @Setter
 public class Product {

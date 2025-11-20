@@ -11,15 +11,23 @@ import org.hibernate.annotations.UuidGenerator;
 import java.util.UUID;
 
 @Entity
-@Table(name="suppliers")
+@Table(name = "suppliers")
 @Getter
 @Setter
 public class Supplier {
+
     @Id
     @GeneratedValue
     @UuidGenerator
     private UUID id;
 
     private String name;
+
     private String contactEmail;
+
+    private String phone;
+
+    private String address;
+
+    private String tradeLicenseNumber;
 }

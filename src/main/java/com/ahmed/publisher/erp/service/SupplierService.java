@@ -1,26 +1,18 @@
 package com.ahmed.publisher.erp.service;
 
-import com.ahmed.publisher.erp.entity.Supplier;
-import com.ahmed.publisher.erp.repository.SupplierRepository;
+import com.ahmed.publisher.erp.dto.CreateSupplierRequest;
+import com.ahmed.publisher.erp.dto.PatchSupplierRequest;
+import com.ahmed.publisher.erp.dto.SupplierDto;
+import com.ahmed.publisher.erp.dto.UpdateSupplierRequest;
 
 import java.util.List;
 import java.util.UUID;
 
-public class SupplierService {
-    private final SupplierRepository supplierRepository;
-    public SupplierService(SupplierRepository supplierRepository){
-        this.supplierRepository=supplierRepository;
-    }
-
-    public List<Supplier> findAll(){
-        return supplierRepository.findAll();
-    }
-
-    public Supplier findById(UUID id){
-        return supplierRepository.findById(id).orElse(null);
-    }
-
-    public Supplier save(Supplier supplier){
-        return supplierRepository.save(supplier);
-    }
+public interface SupplierService {
+    SupplierDto create(CreateSupplierRequest request);
+    SupplierDto findById(UUID id);
+    List<SupplierDto> findAll();
+    SupplierDto update(UUID id, UpdateSupplierRequest updated);
+    SupplierDto patch(UUID id, PatchSupplierRequest patched);
+    void delete(UUID id);
 }
