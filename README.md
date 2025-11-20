@@ -1,6 +1,3 @@
----
-# File: erp/README.md
----
 # ERP System
 
 ## Overview
