@@ -13,13 +13,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConfigDataResourceNotFoundException.class)
     public ResponseEntity<?> handleNotFound(ConfigDataResourceNotFoundException ex){
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ErrorResponse(ex.getMessage()));
+                .body(new CustomErrorResponse(ex.getMessage()));
 
     }
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleGeneric(Exception ex){
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ErrorResponse("Internal Sever Error"));
+                .body(new CustomErrorResponse("Internal Sever Error"));
 
     }
 }

@@ -32,11 +32,6 @@ build/
 ### VS Code ###
 .vscode/
 
-
-### VS Code ###
-
-src/main/java/com/ahmed/publishersync/docker-compose.yml
-
 # Maven target folder
 /target/
 
@@ -75,3 +70,14 @@ spring.log
 
 # Node modules (if you add frontend later)
 node_modules/
+
+# Secret Files
+.env
+
+# Docker
+docker-compose.yml
+
+# Application Properties
+/src/main/resources/application.properties
+/src/main/resources/application-*.properties
+

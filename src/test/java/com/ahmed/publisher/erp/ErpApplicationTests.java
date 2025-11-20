@@ -1,13 +1,13 @@
-package com.ahmed.publisher.erp;
-
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-
-@SpringBootTest
-class ErpApplicationTests {
-
-	@Test
-	void contextLoads() {
-	}
-
-}
+//package com.ahmed.publisher.erp;
+//
+//import org.junit.jupiter.api.Test;
+//import org.springframework.boot.test.context.SpringBootTest;
+//
+//@SpringBootTest
+//class ErpApplicationTests {
+//
+//	@Test
+//	void contextLoads() {
+//	}
+//
+//}

@@ -28,11 +28,13 @@ public class ProductMapper {
         existing.setName(req.name());
         existing.setDescription(req.description());
         existing.setPrice(req.price());
+        existing.setStockQuantity(req.stockQuantity());
     }
 
     public static void applyPatch(Product existing, PatchProductRequest req) {
         if (req.name() != null) existing.setName(req.name());
         if (req.description() != null) existing.setDescription(req.description());
         if (req.price() != null) existing.setPrice(req.price());
+        if (req.stockQuantity()!=null) existing.setStockQuantity(req.stockQuantity());
     }
 }
