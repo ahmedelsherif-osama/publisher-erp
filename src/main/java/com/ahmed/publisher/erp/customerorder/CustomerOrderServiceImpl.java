@@ -1,9 +1,9 @@
-package com.ahmed.publisher.erp.order;
+package com.ahmed.publisher.erp.customerorder;
 
 import com.ahmed.publisher.erp.common.exceptions.ResourceNotFoundException;
-import com.ahmed.publisher.erp.order.dto.CreateOrderRequest;
-import com.ahmed.publisher.erp.order.dto.CreateOrderItemRequest;
-import com.ahmed.publisher.erp.order.dto.OrderDto;
+import com.ahmed.publisher.erp.customerorder.dto.CreateCustomerOrderRequest;
+import com.ahmed.publisher.erp.customerorder.dto.CreateCustomerOrderItemRequest;
+import com.ahmed.publisher.erp.customerorder.dto.CustomerOrderDto;
 import com.ahmed.publisher.erp.product.Product;
 import com.ahmed.publisher.erp.product.ProductRepository;
 import org.springframework.stereotype.Service;
@@ -14,29 +14,29 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class OrderServiceImpl implements OrderService {
+public class CustomerOrderServiceImpl implements CustomerOrderService {
 
-    private final OrderRepository orderRepo;
+    private final CustomerOrderRepository orderRepo;
     private final ProductRepository productRepo;
 
-    public OrderServiceImpl(OrderRepository orderRepo, ProductRepository productRepo) {
+    public CustomerOrderServiceImpl(CustomerOrderRepository orderRepo, ProductRepository productRepo) {
         this.orderRepo = orderRepo;
         this.productRepo = productRepo;
     }
 
     @Override
-    public OrderDto create(CreateOrderRequest request) {
+    public CustomerOrderDto create(CreateCustomerOrderRequest request) {
 
-        Order order = new Order();
+        CustomerOrder order = new CustomerOrder();
         order.setCreatedAt(LocalDateTime.now());
 
-        List<OrderItem> items = new ArrayList<>();
+        List<CustomerOrderItem> items = new ArrayList<>();
 
-        for (CreateOrderItemRequest itemReq : request.items()) {
+        for (CreateCustomerOrderItemRequest itemReq : request.items()) {
             Product product = productRepo.findById(itemReq.productId())
                     .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
-            OrderItem item = new OrderItem();
+            CustomerOrderItem item = new CustomerOrderItem();
             item.setProduct(product);
             item.setQuantity(itemReq.quantity());
             items.add(item);
@@ -44,24 +44,24 @@ public class OrderServiceImpl implements OrderService {
 
         order.setItems(items);
 
-        Order saved = orderRepo.save(order);
+        CustomerOrder saved = orderRepo.save(order);
 
-        return OrderMapper.toDto(saved);
+        return CustomerOrderMapper.toDto(saved);
     }
 
     @Override
-    public OrderDto findById(UUID id) {
-        Order order = orderRepo.findById(id)
+    public CustomerOrderDto findById(UUID id) {
+        CustomerOrder order = orderRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
-        return OrderMapper.toDto(order);
+        return CustomerOrderMapper.toDto(order);
     }
 
     @Override
-    public List<OrderDto> findAll() {
+    public List<CustomerOrderDto> findAll() {
         return orderRepo.findAll()
                 .stream()
-                .map(OrderMapper::toDto)
+                .map(CustomerOrderMapper::toDto)
                 .toList();
     }
 

@@ -1,6 +1,6 @@
 package com.ahmed.publisher.erp.purchaseorder;
 
-import com.ahmed.publisher.erp.order.Order;
+import com.ahmed.publisher.erp.customerorder.CustomerOrder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,15 +14,15 @@ public class PurchaseOrderService {
         this.purchaseOrderRepository=purchaseOrderRepository;
     }
 
-    public List<Order> findAll(){
+    public List<CustomerOrder> findAll(){
         return purchaseOrderRepository.findAll();
     }
 
-    public Order findById(UUID id){
+    public CustomerOrder findById(UUID id){
         return purchaseOrderRepository.findById(id).orElse(null);
     }
 
-    public Order save(Order order){
+    public CustomerOrder save(CustomerOrder order){
         return purchaseOrderRepository.save(order);
     }
 }

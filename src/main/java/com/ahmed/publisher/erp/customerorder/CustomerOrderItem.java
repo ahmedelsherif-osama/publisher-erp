@@ -1,4 +1,4 @@
-package com.ahmed.publisher.erp.order;
+package com.ahmed.publisher.erp.customerorder;
 
 import com.ahmed.publisher.erp.product.Product;
 import jakarta.persistence.*;
@@ -11,7 +11,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
-public class OrderItem {
+public class CustomerOrderItem {
     @Id
     @GeneratedValue
     @UuidGenerator

@@ -1,8 +1,8 @@
-package com.ahmed.publisher.erp.order.dto;
+package com.ahmed.publisher.erp.customerorder.dto;
 
 import java.util.UUID;
 
-public record OrderItemDto(
+public record CustomerOrderItemDto(
         UUID id,
         UUID productId,
         String productName,

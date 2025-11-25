@@ -1,4 +1,4 @@
-package com.ahmed.publisher.erp.order;
+package com.ahmed.publisher.erp.customerorder;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import java.util.UUID;
 @Table(name = "orders")
 @Getter
 @Setter
-public class Order {
+public class CustomerOrder {
     @Id
     @GeneratedValue
     @UuidGenerator
@@ -21,6 +21,6 @@ public class Order {
 
     private LocalDateTime createdAt;
     @OneToMany(cascade = CascadeType.ALL)
-    private List<OrderItem> items;
+    private List<CustomerOrderItem> items;
 
 }

@@ -1,11 +1,11 @@
-package com.ahmed.publisher.erp.order.dto;
+package com.ahmed.publisher.erp.customerorder.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-public record OrderDto(
+public record CustomerOrderDto(
         UUID id,
         LocalDateTime createdAt,
-        List<OrderItemDto> items
+        List<CustomerOrderItemDto> items
 ) {}
