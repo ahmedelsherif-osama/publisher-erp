@@ -1,5 +1,6 @@
-package com.ahmed.publisher.erp.order;
+package com.ahmed.publisher.erp.purchaseorder;
 
+import com.ahmed.publisher.erp.order.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;
