@@ -8,18 +8,32 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.time.LocalDateTime;
+import jakarta.servlet.http.HttpServletRequest;
+
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler(ConfigDataResourceNotFoundException.class)
-    public ResponseEntity<?> handleNotFound(ConfigDataResourceNotFoundException ex){
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new CustomErrorResponse(ex.getMessage()));
 
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<CustomErrorResponse> handleResourceNotFound(
+            ResourceNotFoundException ex,
+            HttpServletRequest request
+    ) {
+        CustomErrorResponse body = new CustomErrorResponse(
+                ex.getMessage(),
+                LocalDateTime.now(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
+    
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleGeneric(Exception ex){
+    public ResponseEntity<?> handleGeneric(Exception ex, HttpServletRequest request){
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new CustomErrorResponse("Internal Sever Error"));
+                .body(new CustomErrorResponse("Internal Sever Error",   LocalDateTime.now(),
+                        request.getRequestURI() ));
 
     }
 }
