@@ -4,6 +4,7 @@ import com.ahmed.publisher.erp.product.dto.CreateProductRequest;
 import com.ahmed.publisher.erp.product.dto.PatchProductRequest;
 import com.ahmed.publisher.erp.product.dto.ProductDto;
 import com.ahmed.publisher.erp.product.dto.UpdateProductRequest;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +38,7 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<ProductDto> update(@PathVariable UUID id,@RequestBody UpdateProductRequest request){
+    public ResponseEntity<ProductDto> update(@PathVariable UUID id,@Valid @RequestBody UpdateProductRequest request){
         return ResponseEntity.ok(service.update(id,request));
     }
 
