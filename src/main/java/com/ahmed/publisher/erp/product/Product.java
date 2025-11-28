@@ -20,7 +20,7 @@ public class Product {
     @GeneratedValue
     @UuidGenerator
     private UUID id;
-
+    private String sku;
     private String name;
     private String description;
     private BigDecimal price;

@@ -1,24 +1,23 @@
 package com.ahmed.publisher.erp.customerorder;
 
-import com.ahmed.publisher.erp.product.Product;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
-@Getter
-@Setter
+@Getter @Setter
+@NoArgsConstructor @AllArgsConstructor
 public class CustomerOrderItem {
-    @Id
-    @GeneratedValue
-    @UuidGenerator
+    @Id @GeneratedValue @UuidGenerator
     private UUID id;
 
-    @ManyToOne
-    private Product product;
-
+    private UUID productId;
+    private String sku;
     private int quantity;
+    private BigDecimal unitPrice;
+    private BigDecimal lineTotal;
+    private boolean reserved;
 }

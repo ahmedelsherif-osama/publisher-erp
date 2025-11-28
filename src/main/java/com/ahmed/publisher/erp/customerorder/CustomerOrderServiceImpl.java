@@ -3,11 +3,13 @@ package com.ahmed.publisher.erp.customerorder;
 import com.ahmed.publisher.erp.common.exceptions.ResourceNotFoundException;
 import com.ahmed.publisher.erp.customerorder.dto.CreateCustomerOrderRequest;
 import com.ahmed.publisher.erp.customerorder.dto.CreateCustomerOrderItemRequest;
+import com.ahmed.publisher.erp.customerorder.dto.CreateOrderItem;
 import com.ahmed.publisher.erp.customerorder.dto.CustomerOrderDto;
 import com.ahmed.publisher.erp.product.Product;
 import com.ahmed.publisher.erp.product.ProductRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,18 +29,22 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     @Override
     public CustomerOrderDto create(CreateCustomerOrderRequest request) {
 
+
         CustomerOrder order = new CustomerOrder();
+        order.setStatus(OrderStatus.CREATED);
         order.setCreatedAt(LocalDateTime.now());
 
         List<CustomerOrderItem> items = new ArrayList<>();
 
-        for (CreateCustomerOrderItemRequest itemReq : request.items()) {
-            Product product = productRepo.findById(itemReq.productId())
+        for (CreateOrderItem itemReq : request.getItems()) {
+            Product product = productRepo.findById(itemReq.getProductId())
                     .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
             CustomerOrderItem item = new CustomerOrderItem();
-            item.setProduct(product);
-            item.setQuantity(itemReq.quantity());
+            item.setSku(product.getSku());
+            item.setQuantity(itemReq.getQuantity());
+            item.setUnitPrice(product.getPrice());
+            item.setLineTotal(product.getPrice().multiply(BigDecimal.valueOf(itemReq.getQuantity())) );
             items.add(item);
         }
 
@@ -65,8 +71,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                 .toList();
     }
 
-    @Override
-    public void delete(UUID id) {
-        orderRepo.deleteById(id);
-    }
+//    @Override
+//    public void delete(UUID id) {
+//        orderRepo.deleteById(id);
+//    }
 }

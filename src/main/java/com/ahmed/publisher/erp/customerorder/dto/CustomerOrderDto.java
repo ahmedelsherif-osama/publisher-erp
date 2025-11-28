@@ -1,11 +1,12 @@
 package com.ahmed.publisher.erp.customerorder.dto;
+import lombok.*;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
-
-public record CustomerOrderDto(
-        UUID id,
-        LocalDateTime createdAt,
-        List<CustomerOrderItemDto> items
-) {}
+import java.math.BigDecimal;
+import java.util.*;
+@Getter @Setter
+public class CustomerOrderDto {
+    private UUID id;
+    private UUID customerId;
+    private String status;
+    private BigDecimal totalAmount;
+}

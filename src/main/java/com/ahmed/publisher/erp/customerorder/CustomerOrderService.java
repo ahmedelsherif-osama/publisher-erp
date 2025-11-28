@@ -10,5 +10,5 @@ public interface CustomerOrderService {
     CustomerOrderDto create(CreateCustomerOrderRequest request);
     CustomerOrderDto findById(UUID id);
     List<CustomerOrderDto> findAll();
-    void delete(UUID id);
+//    void delete(UUID id);
 }
