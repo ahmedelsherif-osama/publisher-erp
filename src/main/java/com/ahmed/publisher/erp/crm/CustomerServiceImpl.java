@@ -59,6 +59,7 @@ public class CustomerServiceImpl implements CustomerService{
      */
     @Override
     public List<CustomerDto> findAll() {
-        return null;
+        var customers= repository.findAll();
+        return customers.stream().map(CustomerMapper::toDto).toList();
     }
 }
