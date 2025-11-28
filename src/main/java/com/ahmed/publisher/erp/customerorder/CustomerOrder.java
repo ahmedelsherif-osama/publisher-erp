@@ -28,4 +28,12 @@ public class CustomerOrder {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CustomerOrderItem> items = new ArrayList<>();
 
+    @PrePersist
+    @PreUpdate
+    private void calculateTotal() {
+        this.totalAmount = items.stream()
+                .map(CustomerOrderItem::getLineTotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
 }

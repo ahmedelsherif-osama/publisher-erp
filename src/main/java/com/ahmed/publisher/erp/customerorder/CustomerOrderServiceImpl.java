@@ -33,6 +33,8 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         CustomerOrder order = new CustomerOrder();
         order.setStatus(OrderStatus.CREATED);
         order.setCreatedAt(LocalDateTime.now());
+        order.setCustomerId(request.getCustomerId());
+        order.setCurrency(request.getCurrency());
 
         List<CustomerOrderItem> items = new ArrayList<>();
 
@@ -42,6 +44,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
             CustomerOrderItem item = new CustomerOrderItem();
             item.setSku(product.getSku());
+
             item.setQuantity(itemReq.getQuantity());
             item.setUnitPrice(product.getPrice());
             item.setLineTotal(product.getPrice().multiply(BigDecimal.valueOf(itemReq.getQuantity())) );
@@ -49,6 +52,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         }
 
         order.setItems(items);
+
 
         CustomerOrder saved = orderRepo.save(order);
 
