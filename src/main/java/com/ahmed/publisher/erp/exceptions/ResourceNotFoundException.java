@@ -1,4 +1,4 @@
-package com.ahmed.publisher.erp.common.exceptions;
+package com.ahmed.publisher.erp.exceptions;
 
 public class ResourceNotFoundException extends  RuntimeException{
     public ResourceNotFoundException(String message){

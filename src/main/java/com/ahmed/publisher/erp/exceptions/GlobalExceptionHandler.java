@@ -1,25 +1,20 @@
-package com.ahmed.publisher.erp.common.exceptions;
+package com.ahmed.publisher.erp.exceptions;
 
-import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
-import jakarta.servlet.http.HttpServletRequest;
-
-
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<CustomErrorResponse> handleValidation(MethodArgumentNotValidException ex,HttpServletRequest request
+    public ResponseEntity<CustomErrorResponse> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest request
     ) {
         String messages = ex.getBindingResult()
                 .getFieldErrors()
@@ -38,18 +33,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<CustomErrorResponse> handleResourceNotFound(
-            ResourceNotFoundException ex,
-            HttpServletRequest request
-    ) {
-        CustomErrorResponse body = new CustomErrorResponse(
-                ex.getMessage(),
-                LocalDateTime.now(),
-                request.getRequestURI()
-        );
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    public ResponseEntity<?> handleNotFound(ResourceNotFoundException ex, HttpServletRequest request){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new CustomErrorResponse(ex.getMessage(), LocalDateTime.now(), request.getRequestURI()));
     }
+
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleGeneric(Exception ex, HttpServletRequest request){

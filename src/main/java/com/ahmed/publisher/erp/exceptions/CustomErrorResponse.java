@@ -1,4 +1,4 @@
-package com.ahmed.publisher.erp.common.exceptions;
+package com.ahmed.publisher.erp.exceptions;
 
 import java.time.LocalDateTime;
 
