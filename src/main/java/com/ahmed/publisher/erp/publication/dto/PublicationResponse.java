@@ -1,6 +1,7 @@
 package com.ahmed.publisher.erp.publication.dto;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 public record PublicationResponse(
@@ -8,5 +9,6 @@ public record PublicationResponse(
         String title,
         String isbn,
         String author,
-        BigDecimal price
+        BigDecimal price,
+        List<PublicationVariantResponse> variants
 ) {}

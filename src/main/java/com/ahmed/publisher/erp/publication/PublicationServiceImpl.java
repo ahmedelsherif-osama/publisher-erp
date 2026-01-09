@@ -2,6 +2,8 @@ package com.ahmed.publisher.erp.publication;
 
 import com.ahmed.publisher.erp.publication.dto.PublicationRequest;
 import com.ahmed.publisher.erp.publication.dto.PublicationResponse;
+import com.ahmed.publisher.erp.publication.dto.PublicationVariantRequest;
+import com.ahmed.publisher.erp.publication.dto.PublicationVariantResponse;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -13,10 +15,17 @@ import java.util.UUID;
 public class PublicationServiceImpl implements PublicationService {
 
     private final PublicationRepository repository;
+    private final PublicationVariantService variantService;
 
-    public PublicationServiceImpl(PublicationRepository repository) {
+    public PublicationServiceImpl(
+            PublicationRepository repository,
+            PublicationVariantService variantService
+    ) {
         this.repository = repository;
+        this.variantService = variantService;
     }
+
+    // ===== Publication CRUD =====
 
     @Override
     public PublicationResponse create(PublicationRequest request) {
@@ -26,8 +35,15 @@ public class PublicationServiceImpl implements PublicationService {
 
         Publication publication = new Publication();
         applyRequest(publication, request);
+        publication = repository.save(publication);
 
-        return toResponse(repository.save(publication));
+        // Auto-create default variant
+        PublicationVariantRequest defaultVariantRequest = new PublicationVariantRequest(
+                "Default", "Default", publication.getPrice(), 0
+        );
+        variantService.createVariant(publication.getId(), defaultVariantRequest);
+
+        return toResponse(publication);
     }
 
     @Override
@@ -36,15 +52,17 @@ public class PublicationServiceImpl implements PublicationService {
                 .orElseThrow(() -> new IllegalArgumentException("Publication not found"));
 
         applyRequest(publication, request);
+        publication = repository.save(publication);
 
-        return toResponse(repository.save(publication));
+        return toResponse(publication);
     }
 
     @Override
     public PublicationResponse getById(UUID id) {
-        return repository.findById(id)
-                .map(this::toResponse)
+        Publication publication = repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Publication not found"));
+
+        return toResponse(publication);
     }
 
     @Override
@@ -62,7 +80,34 @@ public class PublicationServiceImpl implements PublicationService {
         repository.deleteById(id);
     }
 
-    // ===== helpers =====
+    // ===== Variant delegation =====
+
+    @Override
+    public PublicationVariantResponse createVariant(UUID publicationId, PublicationVariantRequest request) {
+        return variantService.createVariant(publicationId, request);
+    }
+
+    @Override
+    public PublicationVariantResponse updateVariant(UUID publicationId, UUID variantId, PublicationVariantRequest request) {
+        return variantService.updateVariant(publicationId, variantId, request);
+    }
+
+    @Override
+    public PublicationVariantResponse getVariant(UUID publicationId, UUID variantId) {
+        return variantService.getVariant(publicationId, variantId);
+    }
+
+    @Override
+    public List<PublicationVariantResponse> getVariants(UUID publicationId) {
+        return variantService.getVariants(publicationId);
+    }
+
+    @Override
+    public void deleteVariant(UUID publicationId, UUID variantId) {
+        variantService.deleteVariant(publicationId, variantId);
+    }
+
+    // ===== Helpers =====
 
     private void applyRequest(Publication publication, PublicationRequest request) {
         publication.setTitle(request.title());
@@ -72,12 +117,16 @@ public class PublicationServiceImpl implements PublicationService {
     }
 
     private PublicationResponse toResponse(Publication publication) {
+        // Include all variants
+        List<PublicationVariantResponse> variants = variantService.getVariants(publication.getId());
+
         return new PublicationResponse(
                 publication.getId(),
                 publication.getTitle(),
                 publication.getIsbn(),
                 publication.getAuthor(),
-                publication.getPrice()
+                publication.getPrice(),
+                variants
         );
     }
 }

@@ -10,7 +10,8 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/publications")
-@PreAuthorize("hasRole('ADMIN')")
+//@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("isAuthenticated()")
 public class PublicationController {
 
     private final PublicationService service;
@@ -19,14 +20,17 @@ public class PublicationController {
         this.service = service;
     }
 
+    // ===== Publication CRUD =====
+
     @PostMapping
     public PublicationResponse create(@RequestBody PublicationRequest request) {
         return service.create(request);
     }
 
     @PutMapping("/{id}")
-    public PublicationResponse update(@PathVariable UUID id,
-                                      @RequestBody PublicationRequest request) {
+    public PublicationResponse update(
+            @PathVariable UUID id,
+            @RequestBody PublicationRequest request) {
         return service.update(id, request);
     }
 
@@ -35,7 +39,6 @@ public class PublicationController {
         return service.getById(id);
     }
 
-    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public List<PublicationResponse> getAll() {
         return service.getAll();
