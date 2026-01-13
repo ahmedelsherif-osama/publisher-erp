@@ -1,5 +1,8 @@
 package com.ahmed.publisher.erp.publication;
 
+import com.ahmed.publisher.erp.exceptions.ResourceNotFoundException;
+import com.ahmed.publisher.erp.integration.bridge.BridgeCatalogClient;
+import com.ahmed.publisher.erp.integration.bridge.PublicationSyncMapper;
 import com.ahmed.publisher.erp.publication.dto.PublicationRequest;
 import com.ahmed.publisher.erp.publication.dto.PublicationResponse;
 import com.ahmed.publisher.erp.publication.dto.PublicationVariantRequest;
@@ -13,16 +16,18 @@ import java.util.UUID;
 @Service
 @Transactional
 public class PublicationServiceImpl implements PublicationService {
-
+    private final BridgeCatalogClient bridgeClient;
     private final PublicationRepository repository;
     private final PublicationVariantService variantService;
 
     public PublicationServiceImpl(
             PublicationRepository repository,
-            PublicationVariantService variantService
+            PublicationVariantService variantService,
+            BridgeCatalogClient bridgeClient
     ) {
         this.repository = repository;
         this.variantService = variantService;
+        this.bridgeClient = bridgeClient;
     }
 
     // ===== Publication CRUD =====
@@ -35,16 +40,17 @@ public class PublicationServiceImpl implements PublicationService {
 
         Publication publication = new Publication();
         applyRequest(publication, request);
+
+
         publication = repository.save(publication);
 
-        // Auto-create default variant
-        PublicationVariantRequest defaultVariantRequest = new PublicationVariantRequest(
-                "Default", "Default", publication.getPrice(), 0
+        bridgeClient.pushPublications(
+              PublicationSyncMapper.toBridgeRequest(publication)
         );
-        variantService.createVariant(publication.getId(), defaultVariantRequest);
 
         return toResponse(publication);
     }
+
 
     @Override
     public PublicationResponse update(UUID id, PublicationRequest request) {
@@ -53,6 +59,10 @@ public class PublicationServiceImpl implements PublicationService {
 
         applyRequest(publication, request);
         publication = repository.save(publication);
+
+        bridgeClient.pushPublications(
+              PublicationSyncMapper.toBridgeRequest(publication)
+        );
 
         return toResponse(publication);
     }
@@ -77,7 +87,9 @@ public class PublicationServiceImpl implements PublicationService {
         if (!repository.existsById(id)) {
             throw new IllegalArgumentException("Publication not found");
         }
-        repository.deleteById(id);
+        Publication publication = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Variant not found"));
+        publication.setDeleted(true);
+        repository.save(publication);
     }
 
     // ===== Variant delegation =====
@@ -113,7 +125,10 @@ public class PublicationServiceImpl implements PublicationService {
         publication.setTitle(request.title());
         publication.setIsbn(request.isbn());
         publication.setAuthor(request.author());
-        publication.setPrice(request.price());
+        publication.setDescription(request.description());
+        for (PublicationVariantRequest v : request.variants()) {
+            variantService.createVariant(publication.getId(), v);
+        }
     }
 
     private PublicationResponse toResponse(Publication publication) {
@@ -125,7 +140,7 @@ public class PublicationServiceImpl implements PublicationService {
                 publication.getTitle(),
                 publication.getIsbn(),
                 publication.getAuthor(),
-                publication.getPrice(),
+                publication.getDescription(),
                 variants
         );
     }

@@ -1,5 +1,7 @@
 package com.ahmed.publisher.erp.publication;
 
+import com.ahmed.publisher.erp.integration.bridge.BridgeCatalogClient;
+import com.ahmed.publisher.erp.integration.bridge.PublicationSyncMapper;
 import com.ahmed.publisher.erp.publication.dto.PublicationVariantRequest;
 import com.ahmed.publisher.erp.publication.dto.PublicationVariantResponse;
 import jakarta.transaction.Transactional;
@@ -14,13 +16,16 @@ public class PublicationVariantServiceImpl implements PublicationVariantService 
 
     private final PublicationVariantRepository variantRepository;
     private final PublicationRepository publicationRepository;
+    private final BridgeCatalogClient bridgeClient;
 
     public PublicationVariantServiceImpl(
             PublicationVariantRepository variantRepository,
-            PublicationRepository publicationRepository
+            PublicationRepository publicationRepository,
+            BridgeCatalogClient bridgeClient
     ) {
         this.variantRepository = variantRepository;
         this.publicationRepository = publicationRepository;
+        this.bridgeClient = bridgeClient;
     }
 
     @Override
@@ -37,6 +42,11 @@ public class PublicationVariantServiceImpl implements PublicationVariantService 
         variant.setStockCount(request.stockCount());
 
         variantRepository.save(variant);
+
+        bridgeClient.pushPublications(
+                PublicationSyncMapper.toBridgeRequest(publication)
+        );
+
         return toResponse(variant);
     }
 
@@ -53,6 +63,11 @@ public class PublicationVariantServiceImpl implements PublicationVariantService 
         variant.setLanguage(request.language());
         variant.setPrice(request.price());
         variant.setStockCount(request.stockCount());
+        Publication publication = variant.getPublication();
+        bridgeClient.pushPublications(
+             PublicationSyncMapper.toBridgeRequest(publication)
+        );
+
 
         return toResponse(variant);
     }
