@@ -9,6 +9,6 @@ public record PublicationResponse(
         String title,
         String isbn,
         String author,
-        BigDecimal price,
+        String description,
         List<PublicationVariantResponse> variants
 ) {}

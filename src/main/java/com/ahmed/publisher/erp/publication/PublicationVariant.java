@@ -1,5 +1,6 @@
 package com.ahmed.publisher.erp.publication;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
@@ -22,5 +23,7 @@ public class PublicationVariant {
     private String format;   // Hardcover, Paperback, eBook, Audiobook
     private String language; // EN, DE, etc.
     private BigDecimal price;
+    @Column(unique = true)
+    private String sku;
     private int stockCount;
 }

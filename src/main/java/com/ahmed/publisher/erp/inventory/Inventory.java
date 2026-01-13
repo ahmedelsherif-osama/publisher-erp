@@ -17,7 +17,7 @@ public class Inventory {
     @GeneratedValue
     private UUID id;
 
-    @OneToOne
+    @OneToOne (cascade = CascadeType.ALL, orphanRemoval = true)
     private Publication publication;
 
     private int quantity;

@@ -1,11 +1,11 @@
 package com.ahmed.publisher.erp.publication;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import jakarta.persistence.Id;
+
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -18,5 +18,9 @@ public class Publication {
     private String title;
     private String isbn;
     private String author;
-    private BigDecimal price;
+    private String description;
+    private boolean deleted = false;
+
+    @OneToMany(mappedBy = "publication", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<PublicationVariant> variants;
 }
