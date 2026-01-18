@@ -1,6 +1,6 @@
 package com.ahmed.publisher.erp.order.dto;
 
-import com.ahmed.publisher.erp.order.OrderStatus;
+import com.ahmed.publisher.erp.order.entity.OrderStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
