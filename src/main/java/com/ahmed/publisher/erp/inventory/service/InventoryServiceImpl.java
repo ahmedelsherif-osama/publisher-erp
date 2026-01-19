@@ -4,13 +4,20 @@ import com.ahmed.publisher.erp.inventory.repository.InventoryAdjustmentRepositor
 import com.ahmed.publisher.erp.inventory.repository.InventoryRepository;
 import com.ahmed.publisher.erp.inventory.entity.Inventory;
 import com.ahmed.publisher.erp.inventory.entity.InventoryAdjustment;
+
 import com.ahmed.publisher.erp.publication.entity.Publication;
 import com.ahmed.publisher.erp.publication.repository.PublicationRepository;
+
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+
+import com.ahmed.publisher.erp.exceptions.BadRequestException;
+import com.ahmed.publisher.erp.exceptions.BusinessRuleViolationException;
+import com.ahmed.publisher.erp.exceptions.ResourceNotFoundException;
+
 
 @Service
 @Transactional
@@ -34,7 +41,9 @@ public class InventoryServiceImpl implements InventoryService {
     public Inventory getByPublication(UUID publicationId) {
         return inventoryRepository.findByPublicationId(publicationId)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Inventory not found for publication")
+                        new ResourceNotFoundException(
+                                "Inventory not found for publication " + publicationId
+                        )
                 );
     }
 
@@ -51,11 +60,15 @@ public class InventoryServiceImpl implements InventoryService {
             UUID referenceId
     ) {
         if (delta == 0) {
-            throw new IllegalArgumentException("Delta cannot be zero");
+            throw new BadRequestException("Stock adjustment delta cannot be zero");
         }
 
         Publication publication = publicationRepository.findById(publicationId)
-                .orElseThrow(() -> new IllegalArgumentException("Publication not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Publication not found with id " + publicationId
+                        )
+                );
 
         Inventory inventory = inventoryRepository
                 .findByPublicationId(publicationId)
@@ -69,16 +82,14 @@ public class InventoryServiceImpl implements InventoryService {
         int newQuantity = inventory.getQuantity() + delta;
 
         if (newQuantity < 0) {
-            throw new IllegalStateException(
+            throw new BusinessRuleViolationException(
                     "Insufficient stock for publication " + publicationId
             );
         }
 
-        // update state
         inventory.setQuantity(newQuantity);
         inventoryRepository.save(inventory);
 
-        // record history
         InventoryAdjustment adjustment = new InventoryAdjustment();
         adjustment.setPublication(publication);
         adjustment.setDelta(delta);
@@ -94,7 +105,6 @@ public class InventoryServiceImpl implements InventoryService {
     public List<InventoryAdjustment> getAllAdjustments() {
         return adjustmentRepository.findAll();
     }
-
 
     @Override
     public List<InventoryAdjustment> getAdjustmentsForPublication(UUID publicationId) {

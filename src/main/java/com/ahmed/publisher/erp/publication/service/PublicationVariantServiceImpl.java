@@ -1,5 +1,6 @@
 package com.ahmed.publisher.erp.publication.service;
 
+import com.ahmed.publisher.erp.exceptions.ResourceNotFoundException;
 import com.ahmed.publisher.erp.integration.bridge.client.BridgeCatalogClient;
 import com.ahmed.publisher.erp.integration.bridge.mapper.PublicationSyncMapper;
 import com.ahmed.publisher.erp.publication.dto.PublicationVariantRequest;
@@ -34,8 +35,7 @@ public class PublicationVariantServiceImpl implements PublicationVariantService 
 
     @Override
     public PublicationVariantResponse createVariant(UUID publicationId, PublicationVariantRequest request) {
-        Publication publication = publicationRepository.findById(publicationId)
-                .orElseThrow(() -> new IllegalArgumentException("Publication not found"));
+        Publication publication = getPublicationOrThrow(publicationId);
 
         PublicationVariant variant = new PublicationVariant();
         variant.setId(UUID.randomUUID());
@@ -47,49 +47,37 @@ public class PublicationVariantServiceImpl implements PublicationVariantService 
 
         variantRepository.save(variant);
 
-        bridgeClient.pushPublications(
-                PublicationSyncMapper.toBridgeRequest(publication)
-        );
+        bridgeClient.pushPublications(PublicationSyncMapper.toBridgeRequest(publication));
 
         return toResponse(variant);
     }
 
     @Override
     public PublicationVariantResponse updateVariant(UUID publicationId, UUID variantId, PublicationVariantRequest request) {
-        PublicationVariant variant = variantRepository.findById(variantId)
-                .orElseThrow(() -> new IllegalArgumentException("Variant not found"));
-
-        if (!variant.getPublication().getId().equals(publicationId)) {
-            throw new IllegalArgumentException("Variant does not belong to the publication");
-        }
+        PublicationVariant variant = getVariantOrThrow(variantId, publicationId);
 
         variant.setFormat(request.format());
         variant.setLanguage(request.language());
         variant.setPrice(request.price());
         variant.setStockCount(request.stockCount());
-        Publication publication = variant.getPublication();
-        bridgeClient.pushPublications(
-             PublicationSyncMapper.toBridgeRequest(publication)
-        );
 
+        variantRepository.save(variant);
+
+        bridgeClient.pushPublications(PublicationSyncMapper.toBridgeRequest(variant.getPublication()));
 
         return toResponse(variant);
     }
 
     @Override
     public PublicationVariantResponse getVariant(UUID publicationId, UUID variantId) {
-        PublicationVariant variant = variantRepository.findById(variantId)
-                .orElseThrow(() -> new IllegalArgumentException("Variant not found"));
-
-        if (!variant.getPublication().getId().equals(publicationId)) {
-            throw new IllegalArgumentException("Variant does not belong to the publication");
-        }
-
+        PublicationVariant variant = getVariantOrThrow(variantId, publicationId);
         return toResponse(variant);
     }
 
     @Override
     public List<PublicationVariantResponse> getVariants(UUID publicationId) {
+        Publication publication = getPublicationOrThrow(publicationId);
+
         return variantRepository.findByPublicationId(publicationId)
                 .stream()
                 .map(this::toResponse)
@@ -98,14 +86,34 @@ public class PublicationVariantServiceImpl implements PublicationVariantService 
 
     @Override
     public void deleteVariant(UUID publicationId, UUID variantId) {
+        PublicationVariant variant = getVariantOrThrow(variantId, publicationId);
+        variantRepository.delete(variant);
+    }
+
+    // =========================
+    // Helpers
+    // =========================
+
+    private Publication getPublicationOrThrow(UUID publicationId) {
+        return publicationRepository.findById(publicationId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Publication with id " + publicationId + " not found")
+                );
+    }
+
+    private PublicationVariant getVariantOrThrow(UUID variantId, UUID publicationId) {
         PublicationVariant variant = variantRepository.findById(variantId)
-                .orElseThrow(() -> new IllegalArgumentException("Variant not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Variant with id " + variantId + " not found")
+                );
 
         if (!variant.getPublication().getId().equals(publicationId)) {
-            throw new IllegalArgumentException("Variant does not belong to the publication");
+            throw new IllegalStateException(
+                    "Variant " + variantId + " does not belong to publication " + publicationId
+            );
         }
 
-        variantRepository.delete(variant);
+        return variant;
     }
 
     private PublicationVariantResponse toResponse(PublicationVariant variant) {

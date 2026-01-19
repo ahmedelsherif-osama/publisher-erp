@@ -1,5 +1,7 @@
 package com.ahmed.publisher.erp.order.service;
 
+import com.ahmed.publisher.erp.exceptions.BusinessRuleViolationException;
+import com.ahmed.publisher.erp.exceptions.ResourceNotFoundException;
 import com.ahmed.publisher.erp.inventory.service.InventoryService;
 import com.ahmed.publisher.erp.order.dto.OrderItemRequest;
 import com.ahmed.publisher.erp.order.dto.OrderResponse;
@@ -30,11 +32,13 @@ public class OrderServiceImpl implements OrderService {
     private final InventoryService inventoryService;
     private final CurrentUserService currentUserService;
 
-    public OrderServiceImpl(OrderRepository orderRepository,
-                            CurrentUserService currentUserService,
-                            UserRepository userRepository,
-                            PublicationRepository publicationRepository,
-                            InventoryService inventoryService) {
+    public OrderServiceImpl(
+            OrderRepository orderRepository,
+            CurrentUserService currentUserService,
+            UserRepository userRepository,
+            PublicationRepository publicationRepository,
+            InventoryService inventoryService
+    ) {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.publicationRepository = publicationRepository;
@@ -42,22 +46,34 @@ public class OrderServiceImpl implements OrderService {
         this.currentUserService = currentUserService;
     }
 
-    @Transactional
     @Override
     public OrderResponse create(List<OrderItemRequest> items) {
         UUID userId = currentUserService.getCurrentUserId();
+
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found with id " + userId)
+                );
 
         Order order = new Order();
         order.setUser(user);
 
         List<OrderItem> orderItems = new ArrayList<>();
+
         for (OrderItemRequest req : items) {
             Publication publication = publicationRepository.findById(req.publicationId())
-                    .orElseThrow(() -> new IllegalArgumentException("Publication not found"));
+                    .orElseThrow(() ->
+                            new ResourceNotFoundException(
+                                    "Publication not found with id " + req.publicationId()
+                            )
+                    );
 
-            inventoryService.adjustStock(req.publicationId(), req.quantity(), "ORDER_CREATED", null);
+            inventoryService.adjustStock(
+                    req.publicationId(),
+                    req.quantity(),
+                    "ORDER_CREATED",
+                    null
+            );
 
             OrderItem item = new OrderItem();
             item.setOrder(order);
@@ -71,7 +87,6 @@ public class OrderServiceImpl implements OrderService {
         return OrderMapper.toResponse(orderRepository.save(order));
     }
 
-
     @Override
     @Transactional(readOnly = true)
     public List<OrderResponse> getAllOrders() {
@@ -82,21 +97,26 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional
     public void cancel(UUID orderId) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Order not found with id " + orderId)
+                );
 
         if (order.getStatus() != OrderStatus.CREATED) {
-            throw new IllegalStateException("Only CREATED orders can be cancelled");
+            throw new BusinessRuleViolationException(
+                    "Only orders with status CREATED can be cancelled"
+            );
         }
 
-        // Roll back inventory
+        // rollback inventory
         for (OrderItem item : order.getItems()) {
-            UUID publicationId = item.getPublication().getId();
-            int quantity = item.getQuantity();
-
-            inventoryService.adjustStock(publicationId, quantity, "ORDER_CANCELLED", order.getId());
+            inventoryService.adjustStock(
+                    item.getPublication().getId(),
+                    item.getQuantity(),
+                    "ORDER_CANCELLED",
+                    order.getId()
+            );
         }
 
         order.setStatus(OrderStatus.CANCELLED);
@@ -104,20 +124,19 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional
     public void complete(UUID orderId) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Order not found with id " + orderId)
+                );
 
         if (order.getStatus() != OrderStatus.CREATED) {
-            throw new IllegalStateException(
-                    "Only CREATED orders can be completed"
+            throw new BusinessRuleViolationException(
+                    "Only orders with status CREATED can be completed"
             );
         }
 
         order.setStatus(OrderStatus.COMPLETED);
         orderRepository.save(order);
     }
-
-
 }
