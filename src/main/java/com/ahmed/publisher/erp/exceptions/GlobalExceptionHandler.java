@@ -14,37 +14,51 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<CustomErrorResponse> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest request
+    public ResponseEntity<CustomErrorResponse> handleValidation(
+            MethodArgumentNotValidException ex,
+            HttpServletRequest request
     ) {
-        String messages = ex.getBindingResult()
+        String message = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
-                .map(f -> f.getField() + ": " + f.getDefaultMessage())
+                .map(e -> e.getField() + ": " + e.getDefaultMessage())
                 .collect(Collectors.joining(", "));
 
-        CustomErrorResponse error = new CustomErrorResponse(
-                "Validation failed: " + messages,
-                LocalDateTime.now(),
-                request.getRequestURI()
-
-
-        );
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        return error(HttpStatus.BAD_REQUEST, "Validation failed: " + message, request);
     }
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<?> handleNotFound(ResourceNotFoundException ex, HttpServletRequest request){
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new CustomErrorResponse(ex.getMessage(), LocalDateTime.now(), request.getRequestURI()));
+    @ExceptionHandler(ApiException.class)
+    public ResponseEntity<CustomErrorResponse> handleApiException(
+            ApiException ex,
+            HttpServletRequest request
+    ) {
+        return error(ex.getStatus(), ex.getMessage(), request);
     }
-
-
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleGeneric(Exception ex, HttpServletRequest request){
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new CustomErrorResponse("Internal Sever Error",   LocalDateTime.now(),
-                        request.getRequestURI() ));
+    public ResponseEntity<CustomErrorResponse> handleUnexpected(
+            Exception ex,
+            HttpServletRequest request
+    ) {
+        ex.printStackTrace();
+        return error(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Internal server error",
+                request
+        );
+    }
 
+    private ResponseEntity<CustomErrorResponse> error(
+            HttpStatus status,
+            String message,
+            HttpServletRequest request
+    ) {
+        return ResponseEntity.status(status).body(
+                new CustomErrorResponse(
+                        message,
+                        LocalDateTime.now(),
+                        request.getRequestURI()
+                )
+        );
     }
 }
