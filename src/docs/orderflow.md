@@ -17,7 +17,7 @@
 ### 1. Create Order Flow
 
 ```mermaid
-graph TB;
+graph RL;
     subgraph "Order Flow"
         A[Client sends create order request] --> B[Security Filter Chain]
         B --> C[Order Request Validation]
@@ -35,7 +35,7 @@ graph TB;
 ### 2. Cancel Order Flow
 
 ```mermaid
-graph TB;
+graph RL;
     subgraph "Cancel Order Flow"
         L[Client sends cancel order request] --> M[Security Filter Chain]
         M --> N[Check Order Exists]
@@ -51,7 +51,7 @@ graph TB;
 ### 3. Complete Order Flow
 
 ```mermaid
-graph TB;
+graph RL;
     subgraph "Complete Order Flow"
         U[Client sends complete order request] --> V[Security Filter Chain]
         V --> W[Check Order Exists]
@@ -66,7 +66,7 @@ graph TB;
 ### 4. Get All Orders Flow
 
 ```mermaid
-graph TB;
+graph RL;
     subgraph "Order Flow - Get All Orders"
         AC[Client sends get all orders request] --> AD[Security Filter Chain]
         AD --> AE[Order Service: Fetch All Orders]
