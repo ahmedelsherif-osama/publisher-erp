@@ -1,6 +1,6 @@
 package com.ahmed.publisher.erp.integration.bridge.client;
 
-import com.ahmed.publisher.erp.exceptions.BridgeApiException;
+import com.ahmed.publisher.erp.exceptions.integration.BridgeApiException;
 import com.ahmed.publisher.erp.integration.bridge.dto.BridgePublicationRequest;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
@@ -8,7 +8,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import com.ahmed.publisher.erp.exceptions.ApiException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

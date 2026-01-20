@@ -1,7 +1,7 @@
 package com.ahmed.publisher.erp.order.service;
 
-import com.ahmed.publisher.erp.exceptions.BusinessRuleViolationException;
-import com.ahmed.publisher.erp.exceptions.ResourceNotFoundException;
+import com.ahmed.publisher.erp.exceptions.business.BusinessRuleViolationException;
+import com.ahmed.publisher.erp.exceptions.http.ResourceNotFoundException;
 import com.ahmed.publisher.erp.inventory.service.InventoryService;
 import com.ahmed.publisher.erp.order.dto.OrderItemRequest;
 import com.ahmed.publisher.erp.order.dto.OrderResponse;

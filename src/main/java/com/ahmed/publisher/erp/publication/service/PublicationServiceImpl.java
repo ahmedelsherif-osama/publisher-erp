@@ -1,6 +1,6 @@
 package com.ahmed.publisher.erp.publication.service;
 
-import com.ahmed.publisher.erp.exceptions.ResourceNotFoundException;
+import com.ahmed.publisher.erp.exceptions.http.ResourceNotFoundException;
 import com.ahmed.publisher.erp.integration.bridge.client.BridgeCatalogClient;
 import com.ahmed.publisher.erp.integration.bridge.mapper.PublicationSyncMapper;
 import com.ahmed.publisher.erp.publication.dto.PublicationRequest;

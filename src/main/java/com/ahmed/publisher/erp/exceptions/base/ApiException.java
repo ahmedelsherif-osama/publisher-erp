@@ -1,4 +1,4 @@
-package com.ahmed.publisher.erp.exceptions;
+package com.ahmed.publisher.erp.exceptions.base;
 
 import org.springframework.http.HttpStatus;
 

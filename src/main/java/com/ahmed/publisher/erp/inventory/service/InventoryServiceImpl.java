@@ -14,9 +14,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 
-import com.ahmed.publisher.erp.exceptions.BadRequestException;
-import com.ahmed.publisher.erp.exceptions.BusinessRuleViolationException;
-import com.ahmed.publisher.erp.exceptions.ResourceNotFoundException;
+import com.ahmed.publisher.erp.exceptions.http.BadRequestException;
+import com.ahmed.publisher.erp.exceptions.business.BusinessRuleViolationException;
+import com.ahmed.publisher.erp.exceptions.http.ResourceNotFoundException;
 
 
 @Service
