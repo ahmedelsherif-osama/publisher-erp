@@ -1,7 +1,7 @@
 package com.ahmed.publisher.erp.user.service;
 
 
-import com.ahmed.publisher.erp.exceptions.notfound.UserNotFoundException;
+import com.ahmed.publisher.erp.exceptions.http.ResourceNotFoundException;
 import com.ahmed.publisher.erp.user.repository.UserRepository;
 import com.ahmed.publisher.erp.user.dto.PatchUserRequest;
 import com.ahmed.publisher.erp.user.dto.UpdateUserRequest;
@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getUserById(UUID id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+                .orElseThrow(() -> new ResourceNotFoundException("Publication with id " + id + " not found"));
         return UserMapper.toDto(user);
     }
 
@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto updateFully(UUID id, UpdateUserRequest request) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+                .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
         UserMapper.applyUpdate(user, request);
         return UserMapper.toDto(userRepository.save(user));
     }
@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto updatePartially(UUID id, PatchUserRequest request) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+                .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
         UserMapper.applyPatch(user, request);
         return UserMapper.toDto(userRepository.save(user));
     }
@@ -63,25 +63,25 @@ public class UserServiceImpl implements UserService {
     @Override
     public void delete(UUID id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+                .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
         userRepository.delete(user);
     }
 
     @Override
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
     }
 
     @Override
     public User findByEmailAndPassword(String email, String password) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found with these credentials"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with these credentials"));
     }
     @Override
     public User findById(UUID userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with these credentials"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with these credentials"));
     }
 
     @Override
