@@ -5,7 +5,7 @@
 1. Login Flow:
     ```mermaid
    graph TD;
-    subgraph "Login Flow"
+    subgraph "Login"
         A[Client] --> B[InternalAuthLoginFlow]
         B --> C[AuthenticatedContext]
         C --> D[Client]
@@ -15,7 +15,7 @@
 2. Registration Flow:
      ```mermaid
    graph TD;
-    subgraph "Registration Flow"
+    subgraph "Registration"
         A[Client] --> B[InternalAuthRegisterFlow]
         B --> C[AuthenticatedContext]
         C --> D[Client]
@@ -25,7 +25,7 @@
 3. Refresh Flow:
 ```mermaid
    graph TD;
-    subgraph "Refresh Flow"
+    subgraph "Refresh"
         A[Client] --> B[InternalAuthRefreshFlow]
         B --> C[AuthenticatedContext]
         C --> D[Client]
@@ -38,7 +38,7 @@
 
 ```mermaid
 graph RL;
-    subgraph "Login Flow"
+    subgraph "Login"
         A[Client sends login request] --> B[Security Filter Chain]
         B --> C[Login Request Validation]
         C -->|invalid / expired| D[401 Authentication Error]
@@ -53,7 +53,7 @@ graph RL;
 
 ```mermaid
 flowchart LR;
-    subgraph "Registration Flow"
+    subgraph "Registration"
         I[Client sends registration request] --> J[Security Filter Chain]
         J --> K[Registration Request Validation]
         K -->|invalid data| L[400 Validation Error]
@@ -69,7 +69,7 @@ flowchart LR;
 
 ```mermaid
 graph RL;
-    subgraph "Refresh Flow"
+    subgraph "Refresh"
         R[Client sends refresh token request] --> S[Security Filter Chain]
         S --> T[Refresh Token Validation]
         T -->|invalid / expired| U[401 Authentication Error]

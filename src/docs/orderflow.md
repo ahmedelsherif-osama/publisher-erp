@@ -4,7 +4,7 @@
 1. Create Order Flow:
     ```mermaid
    graph TD;
-    subgraph "Create Order Flow"
+    subgraph "Create Order"
         A[Client] --> B[InternalOrderCreateFlow]
         B --> C[Order Created]
         C --> D[Client]
@@ -14,7 +14,7 @@
 2. Cancel Order Flow:
      ```mermaid
    graph TD;
-    subgraph "Cancel Order Flow"
+    subgraph "Cancel Order"
         A[Client] --> B[InternalOrderCancelFlow]
         B --> C[Order Cancelled]
         C --> D[Client]
@@ -23,7 +23,7 @@
 3. Complete Order Flow:
      ```mermaid
    graph TD;
-      subgraph "Complete Order Flow"
+      subgraph "Complete Order"
         A3[Client] --> B3[InternalOrderCompleteFlow]
         B3 --> C3[Order Completed]
         C3 --> D3[Client]
@@ -33,7 +33,7 @@
 4. Get All Orders Flow:
 ```mermaid
    graph TD;
-    subgraph "Get All Orders Flow"
+    subgraph "Get All Orders"
         A[Client] --> B[InternalOrderQueryFlow]
         B --> C[List of Orders Returned]
         C --> D[Client]
@@ -45,7 +45,7 @@
 
 ```mermaid
 graph RL;
-    subgraph "Order Flow"
+    subgraph "Order"
         A[Client sends create order request] --> B[Security Filter Chain]
         B --> C[Order Request Validation]
         C -->|invalid| D[400 Bad Request / Validation Error]
@@ -63,7 +63,7 @@ graph RL;
 
 ```mermaid
 graph RL;
-    subgraph "Cancel Order Flow"
+    subgraph "Cancel Order"
         L[Client sends cancel order request] --> M[Security Filter Chain]
         M --> N[Check Order Exists]
         N -->|not found| O[404 Resource Not Found: Order]
@@ -79,7 +79,7 @@ graph RL;
 
 ```mermaid
 graph RL;
-    subgraph "Complete Order Flow"
+    subgraph "Complete Order"
         U[Client sends complete order request] --> V[Security Filter Chain]
         V --> W[Check Order Exists]
         W -->|not found| X[404 Resource Not Found: Order]
