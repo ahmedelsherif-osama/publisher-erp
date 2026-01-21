@@ -45,7 +45,7 @@
 
 ```mermaid
 graph RL;
-    subgraph "Order"
+    subgraph "Create Order"
         A[Client sends create order request] --> B[Security Filter Chain]
         B --> C[Order Request Validation]
         C -->|invalid| D[400 Bad Request / Validation Error]
