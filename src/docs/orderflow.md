@@ -1,17 +1,44 @@
 # Order Flows:
 ## Business View:
 
-1. Create Order:
-   [Client] -> [OrderController.createOrder] -> [OrderService.create] -> [InventoryService.adjustStock] -> [Order Saved] -> [Client]
+1. Create Order Flow:
+    ```mermaid
+   graph TD;
+    subgraph "Create Order Flow"
+        A[Client] --> B[InternalOrderCreateFlow]
+        B --> C[Order Created]
+        C --> D[Client]
+    end
+    ```
 
-2. Cancel Order:
-   [Client] -> [OrderController.cancel] -> [OrderService.cancel] -> [InventoryService.adjustStock (rollback)] -> [Order Updated] -> [Client]
+2. Cancel Order Flow:
+     ```mermaid
+   graph TD;
+    subgraph "Cancel Order Flow"
+        A[Client] --> B[InternalOrderCancelFlow]
+        B --> C[Order Cancelled]
+        C --> D[Client]
+    end
+    ```
+3. Complete Order Flow:
+     ```mermaid
+   graph TD;
+      subgraph "Complete Order Flow"
+        A3[Client] --> B3[InternalOrderCompleteFlow]
+        B3 --> C3[Order Completed]
+        C3 --> D3[Client]
+    end
+    ```
 
-3. Complete Order:
-   [Client] -> [OrderController.complete] -> [OrderService.complete] -> [Order Updated] -> [Client]
-
-4. Get All Orders:
-   [Client] -> [OrderController.getOrders] -> [OrderService.getAllOrders] -> [Client]
+4. Get All Orders Flow:
+```mermaid
+   graph TD;
+    subgraph "Get All Orders Flow"
+        A[Client] --> B[InternalOrderQueryFlow]
+        B --> C[List of Orders Returned]
+        C --> D[Client]
+    end
+```
 
 ## Internal View:
 ### 1. Create Order Flow
