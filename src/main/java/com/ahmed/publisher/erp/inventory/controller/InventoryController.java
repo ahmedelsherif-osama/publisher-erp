@@ -4,6 +4,8 @@ import com.ahmed.publisher.erp.inventory.service.InventoryService;
 import com.ahmed.publisher.erp.inventory.dto.InventoryAdjustmentRequest;
 import com.ahmed.publisher.erp.inventory.entity.Inventory;
 import com.ahmed.publisher.erp.inventory.entity.InventoryAdjustment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,6 +17,7 @@ import java.util.UUID;
 public class InventoryController {
 
     private final InventoryService inventoryService;
+    private static final Logger log = LoggerFactory.getLogger(InventoryController.class);
 
     public InventoryController(InventoryService inventoryService) {
         this.inventoryService = inventoryService;
@@ -33,7 +36,10 @@ public class InventoryController {
 
     @GetMapping("/{publicationId}/adjustments")
     public List<InventoryAdjustment> getAdjustmentsForPublication(@PathVariable UUID publicationId) {
-        return inventoryService.getAdjustmentsForPublication(publicationId);
+        log.debug("Getting adjustments for publicationId={}", publicationId);
+        List<InventoryAdjustment> adjustments = inventoryService.getAdjustmentsForPublication(publicationId);
+        log.info("Found {} adjustments for publicationId={}", adjustments.size(), publicationId);
+        return adjustments;
     }
 
     @GetMapping("/adjustments")

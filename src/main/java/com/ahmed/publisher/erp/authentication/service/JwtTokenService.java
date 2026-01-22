@@ -5,6 +5,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import java.util.UUID;
 @Service
 @Primary
 public class JwtTokenService implements TokenService {
+    private static final Logger log = LoggerFactory.getLogger(JwtTokenService.class);
 
     @Value("${jwt.secret}")
     private String secret;
@@ -23,6 +26,7 @@ public class JwtTokenService implements TokenService {
 
     @Override
     public Optional<String> createToken(User user) {
+        log.debug("Creating JWT token for userId={}", user.getId());
         String token = Jwts.builder()
                 .setSubject(user.getId().toString())
                 .claim("email", user.getEmail())
@@ -42,6 +46,7 @@ public class JwtTokenService implements TokenService {
             getClaims(token);
             return true;
         } catch (Exception e) {
+            log.debug("JWT validation failed");
             return false;
         }
     }
@@ -51,6 +56,7 @@ public class JwtTokenService implements TokenService {
         try {
             return Optional.of(UUID.fromString(getClaims(token).getSubject()));
         } catch (Exception e) {
+            log.debug("Failed to extract userId from JWT");
             return Optional.empty();
         }
     }
