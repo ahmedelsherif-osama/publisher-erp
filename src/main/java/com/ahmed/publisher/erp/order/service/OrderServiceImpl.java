@@ -15,6 +15,8 @@ import com.ahmed.publisher.erp.publication.repository.PublicationRepository;
 import com.ahmed.publisher.erp.user.service.CurrentUserService;
 import com.ahmed.publisher.erp.user.entity.User;
 import com.ahmed.publisher.erp.user.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,8 @@ import java.util.UUID;
 @Service
 @Transactional
 public class OrderServiceImpl implements OrderService {
+
+    private static final Logger log = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
@@ -49,11 +53,13 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderResponse create(List<OrderItemRequest> items) {
         UUID userId = currentUserService.getCurrentUserId();
+        log.info("Creating order for userId={}, number of items={}", userId, items.size());
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found with id " + userId)
-                );
+                .orElseThrow(() -> {
+                    log.error("User not found with id={}", userId);
+                    return new ResourceNotFoundException("User not found with id " + userId);
+                });
 
         Order order = new Order();
         order.setUser(user);
@@ -62,11 +68,12 @@ public class OrderServiceImpl implements OrderService {
 
         for (OrderItemRequest req : items) {
             Publication publication = publicationRepository.findById(req.publicationId())
-                    .orElseThrow(() ->
-                            new ResourceNotFoundException(
-                                    "Publication not found with id " + req.publicationId()
-                            )
-                    );
+                    .orElseThrow(() -> {
+                        log.error("Publication not found with id={}", req.publicationId());
+                        return new ResourceNotFoundException(
+                                "Publication not found with id " + req.publicationId()
+                        );
+                    });
 
             inventoryService.adjustStock(
                     req.publicationId(),
@@ -74,36 +81,44 @@ public class OrderServiceImpl implements OrderService {
                     "ORDER_CREATED",
                     null
             );
+            log.debug("Stock adjusted for publicationId={}, quantity={}", req.publicationId(), req.quantity());
 
             OrderItem item = new OrderItem();
             item.setOrder(order);
             item.setPublication(publication);
             item.setQuantity(req.quantity());
-
             orderItems.add(item);
         }
 
         order.setItems(orderItems);
-        return OrderMapper.toResponse(orderRepository.save(order));
+        Order savedOrder = orderRepository.save(order);
+        log.info("Order created successfully with id={}, total items={}", savedOrder.getId(), savedOrder.getItems().size());
+        return OrderMapper.toResponse(savedOrder);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<OrderResponse> getAllOrders() {
-        return orderRepository.findAll()
+        log.info("Fetching all orders");
+        List<OrderResponse> responses = orderRepository.findAll()
                 .stream()
                 .map(OrderMapper::toResponse)
                 .toList();
+        log.info("Fetched {} orders", responses.size());
+        return responses;
     }
 
     @Override
     public void cancel(UUID orderId) {
+        log.info("Cancelling order with id={}", orderId);
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Order not found with id " + orderId)
-                );
+                .orElseThrow(() -> {
+                    log.error("Order not found with id={}", orderId);
+                    return new ResourceNotFoundException("Order not found with id " + orderId);
+                });
 
         if (order.getStatus() != OrderStatus.CREATED) {
+            log.warn("Cannot cancel order with id={}, status={}", orderId, order.getStatus());
             throw new BusinessRuleViolationException(
                     "Only orders with status CREATED can be cancelled"
             );
@@ -117,20 +132,25 @@ public class OrderServiceImpl implements OrderService {
                     "ORDER_CANCELLED",
                     order.getId()
             );
+            log.debug("Rolled back stock for publicationId={}, quantity={}", item.getPublication().getId(), item.getQuantity());
         }
 
         order.setStatus(OrderStatus.CANCELLED);
         orderRepository.save(order);
+        log.info("Order cancelled successfully with id={}", orderId);
     }
 
     @Override
     public void complete(UUID orderId) {
+        log.info("Completing order with id={}", orderId);
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Order not found with id " + orderId)
-                );
+                .orElseThrow(() -> {
+                    log.error("Order not found with id={}", orderId);
+                    return new ResourceNotFoundException("Order not found with id " + orderId);
+                });
 
         if (order.getStatus() != OrderStatus.CREATED) {
+            log.warn("Cannot complete order with id={}, status={}", orderId, order.getStatus());
             throw new BusinessRuleViolationException(
                     "Only orders with status CREATED can be completed"
             );
@@ -138,5 +158,6 @@ public class OrderServiceImpl implements OrderService {
 
         order.setStatus(OrderStatus.COMPLETED);
         orderRepository.save(order);
+        log.info("Order completed successfully with id={}", orderId);
     }
 }

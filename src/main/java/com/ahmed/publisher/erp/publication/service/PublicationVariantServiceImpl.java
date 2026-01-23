@@ -10,6 +10,8 @@ import com.ahmed.publisher.erp.publication.entity.PublicationVariant;
 import com.ahmed.publisher.erp.publication.repository.PublicationRepository;
 import com.ahmed.publisher.erp.publication.repository.PublicationVariantRepository;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +20,8 @@ import java.util.UUID;
 @Service
 @Transactional
 public class PublicationVariantServiceImpl implements PublicationVariantService {
+
+    private static final Logger log = LoggerFactory.getLogger(PublicationVariantServiceImpl.class);
 
     private final PublicationVariantRepository variantRepository;
     private final PublicationRepository publicationRepository;
@@ -35,6 +39,8 @@ public class PublicationVariantServiceImpl implements PublicationVariantService 
 
     @Override
     public PublicationVariantResponse createVariant(UUID publicationId, PublicationVariantRequest request) {
+        log.info("Creating variant for publicationId={}", publicationId);
+
         Publication publication = getPublicationOrThrow(publicationId);
 
         PublicationVariant variant = new PublicationVariant();
@@ -46,14 +52,19 @@ public class PublicationVariantServiceImpl implements PublicationVariantService 
         variant.setStockCount(request.stockCount());
 
         variantRepository.save(variant);
+        log.debug("Variant persisted id={}", variant.getId());
 
-        bridgeClient.pushPublications(PublicationSyncMapper.toBridgeRequest(publication));
+        bridgeClient.pushPublications(
+                PublicationSyncMapper.toBridgeRequest(publication)
+        );
 
         return toResponse(variant);
     }
 
     @Override
     public PublicationVariantResponse updateVariant(UUID publicationId, UUID variantId, PublicationVariantRequest request) {
+        log.info("Updating variant id={} for publicationId={}", variantId, publicationId);
+
         PublicationVariant variant = getVariantOrThrow(variantId, publicationId);
 
         variant.setFormat(request.format());
@@ -63,20 +74,23 @@ public class PublicationVariantServiceImpl implements PublicationVariantService 
 
         variantRepository.save(variant);
 
-        bridgeClient.pushPublications(PublicationSyncMapper.toBridgeRequest(variant.getPublication()));
+        bridgeClient.pushPublications(
+                PublicationSyncMapper.toBridgeRequest(variant.getPublication())
+        );
 
         return toResponse(variant);
     }
 
     @Override
     public PublicationVariantResponse getVariant(UUID publicationId, UUID variantId) {
-        PublicationVariant variant = getVariantOrThrow(variantId, publicationId);
-        return toResponse(variant);
+        log.debug("Fetching variant id={} for publicationId={}", variantId, publicationId);
+        return toResponse(getVariantOrThrow(variantId, publicationId));
     }
 
     @Override
     public List<PublicationVariantResponse> getVariants(UUID publicationId) {
-        Publication publication = getPublicationOrThrow(publicationId);
+        log.debug("Fetching variants for publicationId={}", publicationId);
+        getPublicationOrThrow(publicationId);
 
         return variantRepository.findByPublicationId(publicationId)
                 .stream()
@@ -86,6 +100,7 @@ public class PublicationVariantServiceImpl implements PublicationVariantService 
 
     @Override
     public void deleteVariant(UUID publicationId, UUID variantId) {
+        log.info("Deleting variant id={} for publicationId={}", variantId, publicationId);
         PublicationVariant variant = getVariantOrThrow(variantId, publicationId);
         variantRepository.delete(variant);
     }
@@ -108,6 +123,7 @@ public class PublicationVariantServiceImpl implements PublicationVariantService 
                 );
 
         if (!variant.getPublication().getId().equals(publicationId)) {
+            log.warn("Variant id={} does not belong to publicationId={}", variantId, publicationId);
             throw new IllegalStateException(
                     "Variant " + variantId + " does not belong to publication " + publicationId
             );
