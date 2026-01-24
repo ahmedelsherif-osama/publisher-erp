@@ -1,16 +1,13 @@
 package com.ahmed.publisher.erp.integration.bridge.client;
 
+import com.ahmed.publisher.erp.config.BridgeProperties;
 import com.ahmed.publisher.erp.exceptions.integration.BridgeApiException;
 import com.ahmed.publisher.erp.integration.bridge.dto.BridgePublicationRequest;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 @Component
 @Qualifier("bridgeRestTemplate")
@@ -19,22 +16,24 @@ public class BridgeCatalogClient {
     private static final Logger log = LoggerFactory.getLogger(BridgeCatalogClient.class);
 
     private final RestTemplate restTemplate;
-    private final String bridgeUrl;
+    private final BridgeProperties bridgeProperties;
 
     public BridgeCatalogClient(
             @Qualifier("bridgeRestTemplate") RestTemplate restTemplate,
-            String bridgeUrl // inject via configuration
+            BridgeProperties bridgeProperties
     ) {
         this.restTemplate = restTemplate;
-        this.bridgeUrl = bridgeUrl;
+        this.bridgeProperties = bridgeProperties;
     }
 
     public void pushPublications(BridgePublicationRequest publication) {
+        String bridgeUrl = bridgeProperties.getUrl(); // get the URL here
+
         log.info("Sending publication to Bridge: {}", publication);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<BridgePublicationRequest> entity = new HttpEntity<>(publication, headers);
+        var headers = new org.springframework.http.HttpHeaders();
+        headers.setContentType(org.springframework.http.MediaType.APPLICATION_JSON);
+        var entity = new org.springframework.http.HttpEntity<>(publication, headers);
 
         try {
             var response = restTemplate.postForEntity(
