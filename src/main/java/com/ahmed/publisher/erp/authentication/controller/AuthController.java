@@ -5,11 +5,13 @@ import com.ahmed.publisher.erp.authentication.dto.RefreshTokenRequest;
 import com.ahmed.publisher.erp.authentication.dto.AuthResponse;
 import com.ahmed.publisher.erp.authentication.dto.LoginRequest;
 import com.ahmed.publisher.erp.user.dto.UserRegistrationRequest;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Authentication", description = "Authentication management APIs")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {

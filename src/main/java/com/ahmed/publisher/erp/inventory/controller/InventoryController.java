@@ -4,6 +4,7 @@ import com.ahmed.publisher.erp.inventory.dto.InventoryAdjustmentRequest;
 import com.ahmed.publisher.erp.inventory.entity.Inventory;
 import com.ahmed.publisher.erp.inventory.entity.InventoryAdjustment;
 import com.ahmed.publisher.erp.inventory.service.InventoryService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+@Tag(name = "Inventory", description = "Inventory management APIs")
 @RestController
 @RequestMapping("/api/inventory")
 public class InventoryController {
