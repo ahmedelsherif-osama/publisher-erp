@@ -80,5 +80,4 @@ docker-compose.yml
 # Application Properties
 /src/main/resources/application.properties
 /src/main/resources/application-*.properties
-/src/main/java/com/ahmed/publisher/erp/config
-
+/src/main/java/com/ahmed/publisher/erp/config/DataInitializer.java
